@@ -9,6 +9,8 @@ class Connection
     private $serverHost;
     private $serverPort;
 
+    private $packageEOF = '\r\n\r\n';
+
     protected $clientConfig = array();
 
     public function setServerHost($host)
@@ -26,6 +28,11 @@ class Connection
         $this->clientConfig = $config;
     }
 
+    public function isConnected()
+    {
+        return $this->isConnected;
+    }
+
     public function __call($name, $arguments)
     {
         if (!$this->isConnected) {
@@ -37,23 +44,27 @@ class Connection
             'args' => $arguments,
         );
 
-        $this->client->send(json_encode($data).'\r\n\r\n');
+        $this->client->send(json_encode($data).$this->packageEOF);
         $data = $this->client->recv();
         $data = json_decode($data, true);
         return $data['data'];
     }
 
+    protected function close()
+    {
+        $this->client->close();
+    }
+
     protected function connect()
     {
         $this->client = new \swoole_client(SWOOLE_TCP | SWOOLE_KEEP);
-        if (!$this->client->connect($this->serverHost, $this->server_port, -1)) {
+        if (!$this->client->connect($this->serverHost, $this->serverPort, -1)) {
             throw new Exception("Connect to pool server failed. Error: {$this->client->errCode}\n");
         }
 
         $defaultConfig = array(
             'open_eof_check' => true,
-            'package_eof' => "\r\n\r\n",
-            'package_max_length' => 1024 * 1024 * 2,
+            'package_eof' => '\r\n\r\n'
         );
 
         $this->client->set(array_merge($defaultConfig, $this->clientConfig));
