@@ -1,0 +1,19 @@
+{
+    "name": "wenqin/sdcc",
+    "description": "swoole connection pool client",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Codeages\\SCPC\\": "src/",
+            "Codeages\\SCPC\\Test\\": "src/tests"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ruanwenqin",
+            "email": "ruanwenqin@howzhi.com"
+        }
+    ],
+    "require": {}
+}
